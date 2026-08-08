@@ -122,6 +122,9 @@ variable "environments" {
 
     All override fields fall back to the module-level defaults when
     unset. Only `branch` is required; everything else optional.
+
+    v0.4.5 addition: `color` — one of blue/green/orange/purple/red/
+    yellow/cyan/gray. Falls back to var.default_env_colors[<env>].
   DESC
   type = map(object({
     branch              = string
@@ -132,8 +135,24 @@ variable "environments" {
     uses_push_to_deploy = optional(bool)
     uses_deploy_hook    = optional(bool)
     uses_hibernation    = optional(bool)
+    color               = optional(string)
   }))
   default = {}
+}
+
+variable "default_env_colors" {
+  description = <<-DESC
+    Default color per env slug. Matches the workspace convention
+    (dev=green for OK, stg=orange for care, prd=red for danger,
+    preview=purple for experimental). Callers override individual
+    envs via environments[<env>].color.
+  DESC
+  type        = map(string)
+  default = {
+    dev = "green"
+    stg = "orange"
+    prd = "red"
+  }
 }
 
 # ────────────────────────────────────────────────────────────────

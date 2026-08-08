@@ -92,6 +92,11 @@ resource "laravelcloud_environment" "envs" {
   uses_deploy_hook    = each.value.uses_deploy_hook != null ? each.value.uses_deploy_hook : var.enable_deploy_hook
   uses_octane         = false
   uses_hibernation    = each.value.uses_hibernation != null ? each.value.uses_hibernation : var.enable_hibernation
+
+  # Env color — visual identifier in the Cloud dashboard.
+  # Per-env override wins over module default (dev=green, stg=orange,
+  # prd=red per the workspace convention).
+  color = each.value.color != null ? each.value.color : lookup(var.default_env_colors, each.key, null)
 }
 
 # ────────────────────────────────────────────────────────────────

@@ -4,11 +4,10 @@ Deploys a Vite SPA / static site onto Laravel Cloud in one HCL block.
 
 ## Purpose
 
-The workspace's public frontend surfaces (`figentra-landing`,
-`academorix-dashboard`, `academorix-landing`) build via `npm run build`
-and serve their `dist/` bundle from Cloud's CDN. They don't need the
-DB + cache + WS + buckets the backend services carry — this module is
-the lightweight version.
+Public frontend surfaces (Vite / Next.js SPAs, static marketing
+sites) build via `npm run build` and serve their `dist/` bundle
+from Cloud's CDN. They don't need the DB + cache + WS + buckets the
+backend services carry — this module is the lightweight version.
 
 ## Contract
 
@@ -34,23 +33,23 @@ Does NOT create:
 module "landing" {
   source = "../../modules/laravel-cloud-static-site"
 
-  name                         = "figentra-landing"
+  name                         = "my-landing"
   region                       = "us-east-1"
   source_control_provider_type = "gitlab"
-  repository                   = "figentra-inc/frontend/landing"
+  repository                   = "my-org/frontend/landing"
 
   environments = {
     dev = {
       branch = "develop"
       variables = {
         NODE_ENV      = "development"
-        VITE_API_URL  = "https://api.dev.figentra.com"
+        VITE_API_URL  = "https://api.dev.example.com"
       }
     }
   }
 
   domains = {
-    dev = "dev.figentra.com"
+    dev = "dev.example.com"
   }
 
   tags = local.common_tags
@@ -59,15 +58,15 @@ module "landing" {
 
 ## Defaults
 
-| Field | Default |
-|---|---|
-| `node_version` | `24` |
-| `build_command` | `npm ci --audit false\nnpm run build` |
-| `deploy_command` | `""` (empty) |
-| `uses_push_to_deploy` | `true` |
-| `uses_deploy_hook` | `false` |
-| `uses_octane` | `false` (forced — irrelevant for static) |
-| `uses_hibernation` | `true` (cost saver — override to `false` on prd) |
+| Field                 | Default                                          |
+| --------------------- | ------------------------------------------------ |
+| `node_version`        | `24`                                             |
+| `build_command`       | `npm ci --audit false\nnpm run build`            |
+| `deploy_command`      | `""` (empty)                                     |
+| `uses_push_to_deploy` | `true`                                           |
+| `uses_deploy_hook`    | `false`                                          |
+| `uses_octane`         | `false` (forced — irrelevant for static)         |
+| `uses_hibernation`    | `true` (cost saver — override to `false` on prd) |
 
 ## Provider version
 

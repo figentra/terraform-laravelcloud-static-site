@@ -1,43 +1,45 @@
-# laravel-cloud-static-site module — deploys a Vite SPA / static site
-# onto Laravel Cloud in one HCL block.
-#
-# ────────────────────────────────────────────────────────────────
-# Contract
-#
-# The workspace's Vite SPAs (figentra-landing, academorix-dashboard,
-# academorix-landing) deploy via Laravel Cloud alongside the backend
-# services rather than via Cloudflare Pages / Vercel / Netlify. Cloud
-# supports Node.js 20/22/24 build environments + serves the built
-# `dist/` bundle from an ephemeral filesystem.
-#
-# What this module creates (Cloud API v2 aligned + provider v0.4.4):
-#   - Application (top-level Cloud unit)
-#   - N environments (dev / stg / prd) with:
-#       - Node runtime pinned via `node_version` (default 24)
-#       - `build_command` set to `npm ci --audit false && npm run build`
-#         (multi-line via \n) by default; overrideable per invocation
-#       - `deploy_command` empty (static sites have no post-build step)
-#       - `uses_octane` false, `uses_hibernation` env-controlled
-#       - Env vars from environments[<env>].variables
-#   - Optional custom domains via var.domains
-#
-# What this module DOES NOT create:
-#   - Database schemas (SPAs don't use them)
-#   - Cache instances (SPAs don't use them)
-#   - WebSocket apps (SPAs don't use them)
-#   - Buckets (SPAs load static assets from Cloud's CDN)
-#
-# For the full-stack backend service shape (DB + cache + WS + buckets),
-# use `../laravel-cloud-service` instead.
-#
-# ────────────────────────────────────────────────────────────────
-# Provider version
-#
-# This module requires provider v0.4.4+ for the `build_command` /
-# `deploy_command` / `node_version` / `uses_*` fields on
-# `laravelcloud_environment`. Callers use the dev-override binary
-# during Wave 8-C authoring; the registry version bumps to 0.4.4
-# after the SPAs prove out in every env.
+/**
+ * @file main.tf
+ * @description Deploys a Vite SPA / Next.js static site onto Laravel
+ *   Cloud in one HCL block. One invocation per static site.
+ *
+ *   Vite / Next.js SPAs deploy via Laravel Cloud alongside backend
+ *   services rather than via Cloudflare Pages / Vercel / Netlify.
+ *   Cloud supports Node.js 20/22/24 build environments + serves the
+ *   built `dist/` bundle from an ephemeral filesystem.
+ *
+ *   Provisions (Cloud API v2 aligned + provider v0.4.4):
+ *     - 1× Application (top-level Cloud unit)
+ *     - N× environments (dev / stg / prd) with:
+ *         - Node runtime pinned via `node_version` (default 24)
+ *         - `build_command` set to `npm ci --audit false && npm run build`
+ *           (multi-line via `\n`) by default; overrideable per invocation
+ *         - `deploy_command` empty (static sites have no post-build step)
+ *         - `uses_octane` false, `uses_hibernation` env-controlled
+ *         - Env vars from `environments[<env>].variables`
+ *     - Optional custom domains via `var.domains`
+ *
+ *   What this module DOES NOT create:
+ *     - Database schemas (SPAs don't use them)
+ *     - Cache instances (SPAs don't use them)
+ *     - WebSocket apps (SPAs don't use them)
+ *     - Buckets (SPAs load static assets from Cloud's CDN)
+ *
+ *   For the full-stack backend service shape (DB + cache + WS +
+ *   buckets), use the sibling `laravel-cloud-service` module.
+ *
+ *   Provider version: requires v0.4.4+ for the `build_command` /
+ *   `deploy_command` / `node_version` / `uses_*` fields on
+ *   `laravelcloud_environment`. Callers use the dev-override binary
+ *   during early authoring; the registry version bumps to 0.4.4
+ *   after the SPAs prove out in every env.
+ *
+ * Cross-refs:
+ *   variables.tf                            application knobs + env map + runtime defaults
+ *   outputs.tf                              application_id / vanity_domains consumed downstream
+ *   laravel-cloud-service/main.tf           sibling module — full-stack backend variant
+ *   cloudflare-record/main.tf               sibling module — DNS records point at vanity_domain
+ */
 
 # ────────────────────────────────────────────────────────────────
 # Application — the top-level Cloud unit.

@@ -17,8 +17,11 @@ terraform {
 
   required_providers {
     laravelcloud = {
-      source  = "figentra/laravel-cloud"
-      version = "~> 0.4"
+      source = "figentra/laravel-cloud"
+      # v0.7.0 required to stay in sync with the sibling
+      # `laravel-cloud-service` module which now sets
+      # `php_major_version` on `laravelcloud_environment.envs`.
+      version = "~> 0.7"
     }
   }
 }
